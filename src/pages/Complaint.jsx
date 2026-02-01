@@ -29,7 +29,7 @@ export default function Complaints() {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://localhost:5000/api/complaints/admin/all",
+        `${import.meta.env.VITE_API_BASE_URL}/api/complaints/admin/all`,
       );
       const result = await response.json();
 
@@ -115,7 +115,7 @@ export default function Complaints() {
   const handleStatusChange = async (complaintId, newStatus) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/complaints/${complaintId}/status`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/complaints/${complaintId}/status`,
         {
           method: "PUT",
           headers: {
