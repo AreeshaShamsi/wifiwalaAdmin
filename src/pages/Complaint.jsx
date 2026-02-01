@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Search, Filter, Clock, CheckCircle, XCircle, AlertCircle, Eye, MessageSquare, Menu } from "lucide-react";
+import {
+  Search,
+  Filter,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Eye,
+  MessageSquare,
+  Menu,
+} from "lucide-react";
 import Sidebar from "../components/Sidebar.jsx";
 // Sidebar Component
-
 
 // Main Complaints Component
 export default function Complaints() {
@@ -13,95 +22,64 @@ export default function Complaints() {
   const [selectedComplaint, setSelectedComplaint] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      setComplaints([
-        {
-          id: 1,
-          userName: "Rahul Sharma",
-          email: "rahul.sharma@email.com",
-          phone: "+91 98765 43210",
-          subject: "Internet Connection Issue",
-          description: "My internet connection has been very slow for the past 3 days. Speed is below 10 Mbps when I have a 100 Mbps plan.",
-          status: "pending",
-          priority: "high",
-          date: "2025-01-18",
-          provider: "Airtel"
-        },
-        {
-          id: 2,
-          userName: "Priya Patel",
-          email: "priya.patel@email.com",
-          phone: "+91 87654 32109",
-          subject: "Billing Error",
-          description: "I was charged twice for this month's subscription. Please refund the extra amount.",
-          status: "in-progress",
-          priority: "medium",
-          date: "2025-01-17",
-          provider: "Jio"
-        },
-        {
-          id: 3,
-          userName: "Amit Kumar",
-          email: "amit.k@email.com",
-          phone: "+91 76543 21098",
-          subject: "Router Not Working",
-          description: "The router provided by the company stopped working suddenly. Need replacement urgently.",
-          status: "resolved",
-          priority: "high",
-          date: "2025-01-16",
-          provider: "BSNL"
-        },
-        {
-          id: 4,
-          userName: "Sneha Reddy",
-          email: "sneha.reddy@email.com",
-          phone: "+91 65432 10987",
-          subject: "Plan Upgrade Request",
-          description: "I want to upgrade my plan from 50 Mbps to 100 Mbps. How can I do this?",
-          status: "pending",
-          priority: "low",
-          date: "2025-01-18",
-          provider: "Airtel"
-        },
-        {
-          id: 5,
-          userName: "Vikram Singh",
-          email: "vikram.singh@email.com",
-          phone: "+91 54321 09876",
-          subject: "Frequent Disconnections",
-          description: "Internet disconnects every 2-3 hours. This is affecting my work from home.",
-          status: "in-progress",
-          priority: "high",
-          date: "2025-01-17",
-          provider: "Jio"
-        },
-      ]);
-      setLoading(false);
-    }, 1000);
+    fetchComplaints();
   }, []);
+
+  const fetchComplaints = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "http://localhost:5000/api/complaints/admin/all",
+      );
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Transform the API response to match our component structure
+        const transformedComplaints = result.complaints.map((complaint) => ({
+          id: complaint.complaint_id,
+          userName: complaint.user_name,
+          email: complaint.email,
+          phone: complaint.phone_number,
+          subject: complaint.subject,
+          description: complaint.description,
+          status: complaint.status,
+          priority: complaint.priority,
+          date: new Date(complaint.created_at).toLocaleDateString("en-CA"), // YYYY-MM-DD format
+          provider: "WiFiWala", // Default provider since it's not in the complaints table
+        }));
+        setComplaints(transformedComplaints);
+      } else {
+        console.error("Failed to fetch complaints:", result.message);
+      }
+    } catch (error) {
+      console.error("Error fetching complaints:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusConfig = (status) => {
     const configs = {
       pending: {
         label: "Pending",
         color: "text-yellow-700 bg-yellow-50 border-yellow-200",
-        icon: Clock
+        icon: Clock,
       },
       "in-progress": {
         label: "In Progress",
         color: "text-blue-700 bg-blue-50 border-blue-200",
-        icon: AlertCircle
+        icon: AlertCircle,
       },
       resolved: {
         label: "Resolved",
         color: "text-green-700 bg-green-50 border-green-200",
-        icon: CheckCircle
+        icon: CheckCircle,
       },
       rejected: {
         label: "Rejected",
         color: "text-red-700 bg-red-50 border-red-200",
-        icon: XCircle
-      }
+        icon: XCircle,
+      },
     };
     return configs[status] || configs.pending;
   };
@@ -110,34 +88,67 @@ export default function Complaints() {
     const configs = {
       high: "text-red-600 bg-red-50 border-red-200",
       medium: "text-orange-600 bg-orange-50 border-orange-200",
-      low: "text-blue-600 bg-blue-50 border-blue-200"
+      low: "text-blue-600 bg-blue-50 border-blue-200",
     };
     return configs[priority] || configs.medium;
   };
 
-  const filteredComplaints = complaints.filter(complaint => {
-    const matchesSearch = 
+  const filteredComplaints = complaints.filter((complaint) => {
+    const matchesSearch =
       complaint.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       complaint.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
       complaint.email.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesStatus = statusFilter === "all" || complaint.status === statusFilter;
-    
+
+    const matchesStatus =
+      statusFilter === "all" || complaint.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
   const stats = {
     total: complaints.length,
-    pending: complaints.filter(c => c.status === "pending").length,
-    inProgress: complaints.filter(c => c.status === "in-progress").length,
-    resolved: complaints.filter(c => c.status === "resolved").length
+    pending: complaints.filter((c) => c.status === "pending").length,
+    inProgress: complaints.filter((c) => c.status === "in-progress").length,
+    resolved: complaints.filter((c) => c.status === "resolved").length,
   };
 
-  const handleStatusChange = (complaintId, newStatus) => {
-    setComplaints(complaints.map(c => 
-      c.id === complaintId ? { ...c, status: newStatus } : c
-    ));
-    setSelectedComplaint(null);
+  const handleStatusChange = async (complaintId, newStatus) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/complaints/${complaintId}/status`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        },
+      );
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Update the local state
+        setComplaints(
+          complaints.map((c) =>
+            c.id === complaintId ? { ...c, status: newStatus } : c,
+          ),
+        );
+
+        // Update the selected complaint if it's the one being changed
+        if (selectedComplaint && selectedComplaint.id === complaintId) {
+          setSelectedComplaint({ ...selectedComplaint, status: newStatus });
+        }
+
+        console.log("Status updated successfully");
+      } else {
+        console.error("Failed to update status:", result.message);
+        alert("Failed to update status. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Error updating status. Please try again.");
+    }
   };
 
   if (loading) {
@@ -160,7 +171,9 @@ export default function Complaints() {
       <div className="lg:ml-64 min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complaints Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Complaints Management
+          </h1>
           <p className="text-gray-600">Monitor and manage user complaints</p>
         </div>
 
@@ -169,8 +182,12 @@ export default function Complaints() {
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-5 border border-blue-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-700 text-sm font-semibold mb-1">Total Complaints</p>
-                <p className="text-3xl font-bold text-blue-900">{stats.total}</p>
+                <p className="text-blue-700 text-sm font-semibold mb-1">
+                  Total Complaints
+                </p>
+                <p className="text-3xl font-bold text-blue-900">
+                  {stats.total}
+                </p>
               </div>
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
                 <MessageSquare className="w-6 h-6 text-white" />
@@ -181,8 +198,12 @@ export default function Complaints() {
           <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-5 border border-yellow-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-yellow-700 text-sm font-semibold mb-1">Pending</p>
-                <p className="text-3xl font-bold text-yellow-900">{stats.pending}</p>
+                <p className="text-yellow-700 text-sm font-semibold mb-1">
+                  Pending
+                </p>
+                <p className="text-3xl font-bold text-yellow-900">
+                  {stats.pending}
+                </p>
               </div>
               <div className="w-12 h-12 bg-yellow-600 rounded-full flex items-center justify-center">
                 <Clock className="w-6 h-6 text-white" />
@@ -193,8 +214,12 @@ export default function Complaints() {
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl p-5 border border-blue-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-700 text-sm font-semibold mb-1">In Progress</p>
-                <p className="text-3xl font-bold text-blue-900">{stats.inProgress}</p>
+                <p className="text-blue-700 text-sm font-semibold mb-1">
+                  In Progress
+                </p>
+                <p className="text-3xl font-bold text-blue-900">
+                  {stats.inProgress}
+                </p>
               </div>
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
                 <AlertCircle className="w-6 h-6 text-white" />
@@ -205,8 +230,12 @@ export default function Complaints() {
           <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-5 border border-green-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-green-700 text-sm font-semibold mb-1">Resolved</p>
-                <p className="text-3xl font-bold text-green-900">{stats.resolved}</p>
+                <p className="text-green-700 text-sm font-semibold mb-1">
+                  Resolved
+                </p>
+                <p className="text-3xl font-bold text-green-900">
+                  {stats.resolved}
+                </p>
               </div>
               <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-white" />
@@ -251,7 +280,7 @@ export default function Complaints() {
             filteredComplaints.map((complaint) => {
               const statusConfig = getStatusConfig(complaint.status);
               const StatusIcon = statusConfig.icon;
-              
+
               return (
                 <div
                   key={complaint.id}
@@ -268,8 +297,12 @@ export default function Complaints() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-bold text-gray-900 text-lg">{complaint.userName}</h3>
-                            <span className={`px-2 py-1 rounded-md text-xs font-semibold border ${getPriorityConfig(complaint.priority)}`}>
+                            <h3 className="font-bold text-gray-900 text-lg">
+                              {complaint.userName}
+                            </h3>
+                            <span
+                              className={`px-2 py-1 rounded-md text-xs font-semibold border ${getPriorityConfig(complaint.priority)}`}
+                            >
                               {complaint.priority.toUpperCase()}
                             </span>
                           </div>
@@ -280,16 +313,24 @@ export default function Complaints() {
                             <span>•</span>
                             <span>{complaint.provider}</span>
                           </div>
-                          <h4 className="font-semibold text-blue-700 mb-2">{complaint.subject}</h4>
-                          <p className="text-gray-600 text-sm line-clamp-2">{complaint.description}</p>
+                          <h4 className="font-semibold text-blue-700 mb-2">
+                            {complaint.subject}
+                          </h4>
+                          <p className="text-gray-600 text-sm line-clamp-2">
+                            {complaint.description}
+                          </p>
                         </div>
                       </div>
                     </div>
 
                     {/* Right Section */}
                     <div className="flex flex-col items-end gap-3">
-                      <span className="text-sm text-gray-500">{complaint.date}</span>
-                      <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-semibold ${statusConfig.color}`}>
+                      <span className="text-sm text-gray-500">
+                        {complaint.date}
+                      </span>
+                      <div
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border font-semibold ${statusConfig.color}`}
+                      >
                         <StatusIcon className="w-4 h-4" />
                         {statusConfig.label}
                       </div>
@@ -308,8 +349,12 @@ export default function Complaints() {
           ) : (
             <div className="text-center py-16 bg-blue-50 rounded-xl border border-blue-100">
               <MessageSquare className="w-16 h-16 text-blue-300 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-gray-700 mb-2">No Complaints Found</h3>
-              <p className="text-gray-600">No complaints match your current filters</p>
+              <h3 className="text-lg font-bold text-gray-700 mb-2">
+                No Complaints Found
+              </h3>
+              <p className="text-gray-600">
+                No complaints match your current filters
+              </p>
             </div>
           )}
         </div>
@@ -319,7 +364,9 @@ export default function Complaints() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Complaint Details</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Complaint Details
+                </h2>
                 <button
                   onClick={() => setSelectedComplaint(null)}
                   className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-all"
@@ -330,42 +377,68 @@ export default function Complaints() {
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-1 block">User Name</label>
-                  <p className="text-gray-900 font-medium">{selectedComplaint.userName}</p>
+                  <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                    User Name
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {selectedComplaint.userName}
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Email</label>
+                    <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                      Email
+                    </label>
                     <p className="text-gray-900">{selectedComplaint.email}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Phone</label>
+                    <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                      Phone
+                    </label>
                     <p className="text-gray-900">{selectedComplaint.phone}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Provider</label>
-                    <p className="text-gray-900">{selectedComplaint.provider}</p>
+                    <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                      Provider
+                    </label>
+                    <p className="text-gray-900">
+                      {selectedComplaint.provider}
+                    </p>
                   </div>
                   <div>
-                    <label className="text-sm font-semibold text-gray-700 mb-1 block">Date</label>
+                    <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                      Date
+                    </label>
                     <p className="text-gray-900">{selectedComplaint.date}</p>
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-1 block">Subject</label>
-                  <p className="text-blue-700 font-medium">{selectedComplaint.subject}</p>
+                  <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                    Subject
+                  </label>
+                  <p className="text-blue-700 font-medium">
+                    {selectedComplaint.subject}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-1 block">Description</label>
-                  <p className="text-gray-700 bg-gray-50 p-4 rounded-lg">{selectedComplaint.description}</p>
+                  <label className="text-sm font-semibold text-gray-700 mb-1 block">
+                    Description
+                  </label>
+                  <p className="text-gray-700 bg-gray-50 p-4 rounded-lg">
+                    {selectedComplaint.description}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">Update Status</label>
+                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
+                    Update Status
+                  </label>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleStatusChange(selectedComplaint.id, "pending")}
+                      onClick={() =>
+                        handleStatusChange(selectedComplaint.id, "pending")
+                      }
                       className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
                         selectedComplaint.status === "pending"
                           ? "bg-yellow-600 text-white"
@@ -375,7 +448,9 @@ export default function Complaints() {
                       Pending
                     </button>
                     <button
-                      onClick={() => handleStatusChange(selectedComplaint.id, "in-progress")}
+                      onClick={() =>
+                        handleStatusChange(selectedComplaint.id, "in-progress")
+                      }
                       className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
                         selectedComplaint.status === "in-progress"
                           ? "bg-blue-600 text-white"
@@ -385,7 +460,9 @@ export default function Complaints() {
                       In Progress
                     </button>
                     <button
-                      onClick={() => handleStatusChange(selectedComplaint.id, "resolved")}
+                      onClick={() =>
+                        handleStatusChange(selectedComplaint.id, "resolved")
+                      }
                       className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
                         selectedComplaint.status === "resolved"
                           ? "bg-green-600 text-white"
@@ -395,7 +472,9 @@ export default function Complaints() {
                       Resolved
                     </button>
                     <button
-                      onClick={() => handleStatusChange(selectedComplaint.id, "rejected")}
+                      onClick={() =>
+                        handleStatusChange(selectedComplaint.id, "rejected")
+                      }
                       className={`flex-1 py-2 px-4 rounded-lg font-semibold transition-all ${
                         selectedComplaint.status === "rejected"
                           ? "bg-red-600 text-white"

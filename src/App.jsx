@@ -8,6 +8,9 @@ import AdminLogin from "./pages/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Complaint from "./pages/Complaint.jsx";
+import Settings from "./pages/Settings.jsx";
+import Users from "./pages/Users.jsx";
+import Subscribed from "./pages/Subscribed.jsx";
 
 function App() {
   return (
@@ -21,7 +24,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard/>
+              <Dashboard />
             </ProtectedRoute>
           }
         />
@@ -35,7 +38,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/complain"
           element={
             <ProtectedRoute>
@@ -49,6 +52,33 @@ function App() {
           element={
             <ProtectedRoute>
               <Offer />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <Users />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/subscribed"
+          element={
+            <ProtectedRoute>
+              <Subscribed />
             </ProtectedRoute>
           }
         />

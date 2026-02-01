@@ -7,17 +7,24 @@ function TwoColumnSidebar() {
   // Get current page from URL
   const getCurrentPage = () => {
     const path = window.location.pathname;
-    if (path === '/plans') return 'Plans';
-    if (path === '/offer') return 'Offers';
-    if (path === '/complain') return 'Complain';
-    if (path === '/settings') return 'Settings';
-    if (path === '/logout') return 'Logout';
-    return 'Home';
+    if (path === "/plans") return "Plans";
+    if (path === "/users") return "Users";
+    if (path === "/subscribed") return "Subscribed";
+    if (path === "/offer") return "Offers";
+    if (path === "/complain") return "Complain";
+    if (path === "/settings") return "Settings";
+    if (path === "/logout") return "Logout";
+    return "Home";
   };
 
   const [activeItem, setActiveItem] = useState(getCurrentPage());
 
   const handleNavClick = (path, href) => {
+    if (path === "Logout") {
+      sessionStorage.clear();
+      window.location.href = "/";
+      return;
+    }
     setActiveItem(path);
     setMobileOpen(false);
     // Navigate to the page
@@ -26,11 +33,48 @@ function TwoColumnSidebar() {
 
   const menuItems = [
     { icon: "fa-solid fa-house", label: "Home", path: "Home", href: "/" },
-    { icon: "fa-solid fa-clipboard-list", label: "Plans", path: "Plans", href: "/plans" },
-    { icon: "fa-solid fa-tag", label: "Offers", path: "Offers", href: "/offer" },
-    { icon: "fa-solid fa-exclamation-circle", label: "Complain", path: "Complain", href: "/complain" },
-    { icon: "fa-solid fa-gear", label: "Settings", path: "Settings", href: "/settings" },
-    { icon: "fa-solid fa-right-from-bracket", label: "Logout", path: "Logout", href: "/logout" },
+    {
+      icon: "fa-solid fa-clipboard-list",
+      label: "Plans",
+      path: "Plans",
+      href: "/plans",
+    },
+    {
+      icon: "fa-solid fa-users",
+      label: "Users",
+      path: "Users",
+      href: "/users",
+    },
+    {
+      icon: "fa-solid fa-check-circle",
+      label: "Subscribed",
+      path: "Subscribed",
+      href: "/subscribed",
+    },
+    {
+      icon: "fa-solid fa-tag",
+      label: "Offers",
+      path: "Offers",
+      href: "/offer",
+    },
+    {
+      icon: "fa-solid fa-exclamation-circle",
+      label: "Complain",
+      path: "Complain",
+      href: "/complain",
+    },
+    {
+      icon: "fa-solid fa-gear",
+      label: "Settings",
+      path: "Settings",
+      href: "/settings",
+    },
+    {
+      icon: "fa-solid fa-right-from-bracket",
+      label: "Logout",
+      path: "Logout",
+      href: "/logout",
+    },
   ];
 
   return (
