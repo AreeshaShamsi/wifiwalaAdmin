@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, X, Plus, Edit2, Trash2, Save, XCircle } from "lucide-react";
 import Sidebar from "../components/Sidebar.jsx";
 
-
-
-
-const BASE_URL = "https://wifiwala-backend.vercel.app";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ;
 
 export const API_CREATE_URL = `${BASE_URL}/api/plans/create`;
 export const API_READ_URL   = `${BASE_URL}/api/plans`;
@@ -18,11 +15,11 @@ function PlansPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [formData, setFormData] = useState({
-    provider: "",
+    name: "",
     speed: "",
     price: "",
-    validity: "30 days",
-    data: "Unlimited",
+    duration_days: "30",
+    data_limit: "Unlimited",
     color: "from-blue-500 to-blue-600",
     icon: "fa-solid fa-wifi"
   });
@@ -51,25 +48,60 @@ function PlansPage() {
   const fetchPlans = async () => {
     try {
       setLoading(true);
+      console.log("Fetching plans from:", API_READ_URL);
+      
       const response = await fetch(API_READ_URL);
       const data = await response.json();
       
-      if (data.success) {
-        // Map backend data and add UI properties
-        const formattedPlans = data.plans.map(plan => ({
-          id: plan._id,
-          provider: plan.providerName,
-          speed: plan.speed,
-          price: plan.price,
-          validity: plan.validity,
-          data: plan.data,
+      console.log("Raw API Response:", data);
+      console.log("Response type:", typeof data);
+      console.log("Is Array?", Array.isArray(data));
+      
+      // Handle multiple possible response formats
+      let plansArray = [];
+      
+      if (Array.isArray(data)) {
+        // Response is directly an array
+        plansArray = data;
+      } else if (data.plans && Array.isArray(data.plans)) {
+        // Response has a plans property
+        plansArray = data.plans;
+      } else if (data.data && Array.isArray(data.data)) {
+        // Response has a data property
+        plansArray = data.data;
+      } else if (data.success && data.plans) {
+        // Response has success flag and plans
+        plansArray = data.plans;
+      }
+      
+      console.log("Plans Array:", plansArray);
+      console.log("Plans Count:", plansArray.length);
+      
+      if (plansArray.length > 0) {
+        console.log("First plan structure:", plansArray[0]);
+      }
+      
+      // Map backend data and add UI properties
+      const formattedPlans = plansArray.map(plan => {
+        console.log("Processing plan:", plan);
+        return {
+          id: plan.id || plan._id,
+          name: plan.name || "",
+          speed: plan.speed || "",
+          price: plan.price || "",
+          duration_days: plan.duration_days || "",
+          data_limit: plan.data_limit || "",
           color: plan.color || "from-blue-500 to-blue-600",
           icon: plan.icon || "fa-solid fa-wifi"
-        }));
-        setPlans(formattedPlans);
-      }
+        };
+      });
+      
+      console.log("Formatted Plans:", formattedPlans);
+      setPlans(formattedPlans);
+      
     } catch (error) {
       console.error("Error fetching plans:", error);
+      console.error("Error details:", error.message);
     } finally {
       setLoading(false);
     }
@@ -77,34 +109,38 @@ function PlansPage() {
 
   const handleAddPlan = async () => {
     // Validation
-    if (!formData.provider || !formData.speed || !formData.price || !formData.validity || !formData.data) {
-      alert("Please fill all required fields");
+    if (!formData.name || !formData.duration_days || !formData.price) {
+      alert("Please fill all required fields (name, duration_days, price)");
       return;
     }
 
     try {
+      const requestBody = {
+        name: formData.name,
+        speed: formData.speed || null,
+        price: parseFloat(formData.price),
+        duration_days: parseInt(formData.duration_days),
+        data_limit: formData.data_limit || null,
+        color: formData.color,
+        icon: formData.icon
+      };
+      
+      console.log("Creating plan with data:", requestBody);
+      
       const response = await fetch(API_CREATE_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          providerName: formData.provider,
-          speed: formData.speed,
-          price: formData.price,
-          validity: formData.validity,
-          data: formData.data,
-          color: formData.color,
-          icon: formData.icon
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
+      console.log("Create response:", data);
 
-      if (data.success) {
+      if (data.message === "Plan created successfully" || data.plan) {
         alert("Plan created successfully!");
         resetForm();
-        // Fetch all plans again to show the newly created plan
         fetchPlans();
       } else {
         alert(data.message || "Failed to create plan");
@@ -116,13 +152,14 @@ function PlansPage() {
   };
 
   const handleEditPlan = (plan) => {
+    console.log("Editing plan:", plan);
     setEditingPlan(plan.id);
     setFormData({
-      provider: plan.provider,
+      name: plan.name,
       speed: plan.speed,
       price: plan.price,
-      validity: plan.validity,
-      data: plan.data,
+      duration_days: plan.duration_days,
+      data_limit: plan.data_limit,
       color: plan.color,
       icon: plan.icon
     });
@@ -131,34 +168,38 @@ function PlansPage() {
 
   const handleUpdatePlan = async () => {
     // Validation
-    if (!formData.provider || !formData.speed || !formData.price || !formData.validity || !formData.data) {
-      alert("Please fill all required fields");
+    if (!formData.name || !formData.duration_days || !formData.price) {
+      alert("Please fill all required fields (name, duration_days, price)");
       return;
     }
 
     try {
+      const requestBody = {
+        name: formData.name,
+        speed: formData.speed || null,
+        price: parseFloat(formData.price),
+        duration_days: parseInt(formData.duration_days),
+        data_limit: formData.data_limit || null,
+        color: formData.color,
+        icon: formData.icon
+      };
+      
+      console.log("Updating plan with data:", requestBody);
+      
       const response = await fetch(`${API_UPDATE_URL}/${editingPlan}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          providerName: formData.provider,
-          speed: formData.speed,
-          price: formData.price,
-          validity: formData.validity,
-          data: formData.data,
-          color: formData.color,
-          icon: formData.icon
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
+      console.log("Update response:", data);
 
-      if (data.success) {
+      if (data.success || data.message === "Plan updated successfully" || data.plan) {
         alert("Plan updated successfully!");
         resetForm();
-        // Fetch all plans again to show updated data
         fetchPlans();
       } else {
         alert(data.message || "Failed to update plan");
@@ -175,15 +216,17 @@ function PlansPage() {
     }
 
     try {
+      console.log("Deleting plan with ID:", id);
+      
       const response = await fetch(`${API_DELETE_URL}/${id}`, {
         method: "DELETE",
       });
 
       const data = await response.json();
+      console.log("Delete response:", data);
 
-      if (data.success) {
+      if (data.success || data.message === "Plan deleted successfully") {
         alert("Plan deleted successfully!");
-        // Fetch all plans again to refresh the list
         fetchPlans();
       } else {
         alert(data.message || "Failed to delete plan");
@@ -196,11 +239,11 @@ function PlansPage() {
 
   const resetForm = () => {
     setFormData({
-      provider: "",
+      name: "",
       speed: "",
       price: "",
-      validity: "30 days",
-      data: "Unlimited",
+      duration_days: "30",
+      data_limit: "Unlimited",
       color: "from-blue-500 to-blue-600",
       icon: "fa-solid fa-wifi"
     });
@@ -273,20 +316,26 @@ function PlansPage() {
                           </div>
                         </div>
 
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">{plan.provider}</h3>
+                        <h3 className="text-lg font-bold text-gray-800 mb-2">{plan.name}</h3>
                         <div className="space-y-1.5 mb-3">
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <i className="fa-solid fa-gauge text-indigo-600 text-xs"></i>
-                            <span className="text-xs">Speed: <strong>{plan.speed}</strong></span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <i className="fa-solid fa-calendar text-indigo-600 text-xs"></i>
-                            <span className="text-xs">Validity: <strong>{plan.validity}</strong></span>
-                          </div>
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <i className="fa-solid fa-database text-indigo-600 text-xs"></i>
-                            <span className="text-xs">Data: <strong>{plan.data}</strong></span>
-                          </div>
+                          {plan.speed && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <i className="fa-solid fa-gauge text-indigo-600 text-xs"></i>
+                              <span className="text-xs">Speed: <strong>{plan.speed}</strong></span>
+                            </div>
+                          )}
+                          {plan.duration_days && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <i className="fa-solid fa-calendar text-indigo-600 text-xs"></i>
+                              <span className="text-xs">Duration: <strong>{plan.duration_days} days</strong></span>
+                            </div>
+                          )}
+                          {plan.data_limit && (
+                            <div className="flex items-center gap-2 text-gray-600">
+                              <i className="fa-solid fa-database text-indigo-600 text-xs"></i>
+                              <span className="text-xs">Data: <strong>{plan.data_limit}</strong></span>
+                            </div>
+                          )}
                         </div>
 
                         <div className="border-t border-gray-200 pt-3">
@@ -345,13 +394,13 @@ function PlansPage() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Provider Name</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Plan Name *</label>
                   <input
                     type="text"
-                    value={formData.provider}
-                    onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., BSNL Fiber"
+                    placeholder="e.g., BSNL Fiber Basic"
                   />
                 </div>
 
@@ -367,7 +416,7 @@ function PlansPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Price (₹)</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Price (₹) *</label>
                   <input
                     type="number"
                     value={formData.price}
@@ -378,22 +427,22 @@ function PlansPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Validity</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Duration (Days) *</label>
                   <input
-                    type="text"
-                    value={formData.validity}
-                    onChange={(e) => setFormData({ ...formData, validity: e.target.value })}
+                    type="number"
+                    value={formData.duration_days}
+                    onChange={(e) => setFormData({ ...formData, duration_days: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="e.g., 30 days"
+                    placeholder="e.g., 30"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Data</label>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1.5">Data Limit</label>
                   <input
                     type="text"
-                    value={formData.data}
-                    onChange={(e) => setFormData({ ...formData, data: e.target.value })}
+                    value={formData.data_limit}
+                    onChange={(e) => setFormData({ ...formData, data_limit: e.target.value })}
                     className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="e.g., Unlimited"
                   />

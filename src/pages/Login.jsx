@@ -1,18 +1,34 @@
-import React, { useState } from "react";
-import { Lock, User, Eye, EyeOff, Shield, ArrowRight, AlertCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  Shield,
+  ArrowRight,
+  AlertCircle
+} from "lucide-react";
+
 
 export default function AdminLogin() {
   const navigate = useNavigate();
 
+  // 🔒 If already logged in, skip login page
+  useEffect(() => {
+    const token = sessionStorage.getItem("adminToken");
+    if (token) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  // ENV credentials (Vite)
+
   const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
   const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
@@ -20,19 +36,17 @@ export default function AdminLogin() {
     setError("");
     setIsLoading(true);
 
+    const togglePassword = () => {
+  setShowPassword(prev => !prev);
+};
+
+
     setTimeout(() => {
       if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-        // 🔐 SAVE AUTH FLAG
-        localStorage.setItem("adminToken", "true");
-
-        // Optional: remember me
-        if (rememberMe) {
-          localStorage.setItem("rememberAdmin", "true");
-        }
+        // ✅ SAVE SESSION TOKEN
+        sessionStorage.setItem("adminToken", "true");
 
         setIsLoading(false);
-
-        // 🚀 REDIRECT
         navigate("/dashboard", { replace: true });
       } else {
         setIsLoading(false);
@@ -42,10 +56,11 @@ export default function AdminLogin() {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSubmit();
-    }
+    if (e.key === "Enter") handleSubmit();
   };
+
+  
+  
 
   return (
     <div className="h-screen bg-gradient-to-br from-blue-50 via-slate-50 to-blue-50 flex items-center justify-center p-4 overflow-hidden">
