@@ -11,6 +11,8 @@ import Complaint from "./pages/Complaint.jsx";
 import Settings from "./pages/Settings.jsx";
 import Users from "./pages/Users.jsx";
 import Subscribed from "./pages/Subscribed.jsx";
+import VIPoffers from "./pages/VipOffers.jsx";
+import Carousel from "./pages/Carouselchange.jsx";
 
 function App() {
   return (
@@ -47,11 +49,30 @@ function App() {
           }
         />
 
+         <Route
+          path="/carousel-change"
+          element={
+            <ProtectedRoute>
+              <Carousel />
+            </ProtectedRoute>
+          }
+        />
+
+
         <Route
           path="/offer"
           element={
             <ProtectedRoute>
               <Offer />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/vipoffers"
+          element={
+            <ProtectedRoute>
+              <VIPoffers />
             </ProtectedRoute>
           }
         />

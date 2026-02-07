@@ -12,6 +12,7 @@ function TwoColumnSidebar() {
     if (path === "/subscribed") return "Subscribed";
     if (path === "/offer") return "Offers";
     if (path === "/complain") return "Complain";
+    if (path === "/vipoffers") return "VIP Offers";
     if (path === "/settings") return "Settings";
     if (path === "/logout") return "Logout";
     return "Home";
@@ -64,6 +65,12 @@ function TwoColumnSidebar() {
       href: "/complain",
     },
     {
+      icon: "fa-solid fa-crown",
+      label: "VIP Offers",
+      path: "VIP Offers",
+      href: "/vipoffers",
+    },
+    {
       icon: "fa-solid fa-gear",
       label: "Settings",
       path: "Settings",
@@ -114,10 +121,10 @@ function TwoColumnSidebar() {
           </div>
 
           {/* Menu */}
-          <nav className="flex-1 space-y-1.5">
-            {menuItems.map((item) => (
+          <nav className="flex-1 space-y-1.5 overflow-y-auto">
+            {menuItems.map((item, index) => (
               <button
-                key={item.path}
+                key={`${item.path}-${index}`}
                 onClick={() => handleNavClick(item.path, item.href)}
                 className={`flex items-center gap-3 px-3.5 py-3 rounded-xl w-full text-left transition-all duration-200 ${
                   activeItem === item.path
