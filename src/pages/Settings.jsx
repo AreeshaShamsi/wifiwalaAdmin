@@ -1,27 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
 
 function Settings() {
   const [settings, setSettings] = useState({
+    id: null,
+    primary_number: "",
+    secondary_number: "",
+    whatsapp_number: "",
+    email_id: "",
+    company_name: "",
     theme: "light",
     primaryColor: "blue",
-    companyName: "PrimeDesk",
     enableNotifications: true,
     enableEmailAlerts: true,
     enableSMSAlerts: false,
     autoBackup: true,
     backupFrequency: "daily",
-    timezone: "Asia/Kolkata",
-    dateFormat: "DD/MM/YYYY",
-    currency: "INR",
-    supportEmail: "support@primedesk.com",
-    supportPhone: "+91 76681 29807",
     maintenanceMode: false,
     maxLoginAttempts: 5,
     sessionTimeout: 60,
   });
 
   const [activeTab, setActiveTab] = useState("general");
+  const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
+
+  // Fetch settings from backend
+  const fetchSettings = async () => {
+    try {
+      setFetchLoading(true);
+      const res = await fetch("http://localhost:5000/api/settings");
+      if (!res.ok) {
+        throw new Error("Failed to fetch settings");
+      }
+      const data = await res.json();
+      
+      // If settings exist, use the first one
+      if (data && data.length > 0) {
+        const dbSettings = data[0];
+        setSettings((prev) => ({
+          ...prev,
+          id: dbSettings.id,
+          primary_number: dbSettings.primary_number || "",
+          secondary_number: dbSettings.secondary_number || "",
+          whatsapp_number: dbSettings.whatsapp_number || "",
+          email_id: dbSettings.email_id || "",
+          company_name: dbSettings.company_name || "",
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      alert("Failed to load settings from server");
+    } finally {
+      setFetchLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
 
   const handleSettingChange = (key, value) => {
     setSettings((prev) => ({
@@ -30,9 +67,53 @@ function Settings() {
     }));
   };
 
-  const saveSettings = () => {
-    // Here you would normally save to backend
-    alert("Settings saved successfully!");
+  const saveSettings = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        primary_number: settings.primary_number,
+        secondary_number: settings.secondary_number,
+        whatsapp_number: settings.whatsapp_number,
+        email_id: settings.email_id,
+        company_name: settings.company_name,
+      };
+
+      let res;
+      if (settings.id) {
+        // Update existing settings
+        res = await fetch(`http://localhost:5000/api/settings/${settings.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // Create new settings
+        res = await fetch("http://localhost:5000/api/settings", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      if (!res.ok) {
+        throw new Error("Failed to save settings");
+      }
+
+      const data = await res.json();
+      alert(data.message || "Settings saved successfully!");
+      
+      // Refresh settings from server
+      await fetchSettings();
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      alert("Failed to save settings. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resetSettings = () => {
@@ -40,19 +121,19 @@ function Settings() {
       window.confirm("Are you sure you want to reset all settings to default?")
     ) {
       setSettings({
+        id: null,
+        primary_number: "",
+        secondary_number: "",
+        whatsapp_number: "",
+        email_id: "",
+        company_name: "PrimeDesk",
         theme: "light",
         primaryColor: "blue",
-        companyName: "PrimeDesk",
         enableNotifications: true,
         enableEmailAlerts: true,
         enableSMSAlerts: false,
         autoBackup: true,
         backupFrequency: "daily",
-        timezone: "Asia/Kolkata",
-        dateFormat: "DD/MM/YYYY",
-        currency: "INR",
-        supportEmail: "support@primedesk.com",
-        supportPhone: "+91 76681 29807",
         maintenanceMode: false,
         maxLoginAttempts: 5,
         sessionTimeout: 60,
@@ -78,6 +159,24 @@ function Settings() {
     { value: "orange", label: "Orange", class: "bg-orange-600" },
   ];
 
+  if (fetchLoading) {
+    return (
+      <>
+        <Sidebar />
+        <div className="lg:ml-64 min-h-screen lg:p-4">
+          <div className="h-full lg:min-h-[calc(100vh-2rem)] bg-white/40 backdrop-blur-sm lg:rounded-[3rem] p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/50">
+            <div className="flex items-center justify-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading settings...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Sidebar />
@@ -89,14 +188,19 @@ function Settings() {
               <button
                 onClick={resetSettings}
                 className="px-4 py-2 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all"
+                disabled={loading}
               >
                 Reset to Default
               </button>
               <button
                 onClick={saveSettings}
-                className="px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all"
+                className="px-4 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-all flex items-center gap-2"
+                disabled={loading}
               >
-                Save Settings
+                {loading && (
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                )}
+                {loading ? "Saving..." : "Save Settings"}
               </button>
             </div>
           </div>
@@ -104,12 +208,12 @@ function Settings() {
           <div className="bg-white rounded-lg shadow overflow-hidden">
             {/* Tabs */}
             <div className="border-b border-gray-200">
-              <nav className="flex space-x-8 px-6">
+              <nav className="flex space-x-8 px-6 overflow-x-auto">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                    className={`flex items-center gap-2 py-4 px-2 border-b-2 font-medium text-sm transition-colors whitespace-nowrap ${
                       activeTab === tab.id
                         ? "border-blue-500 text-blue-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -138,93 +242,72 @@ function Settings() {
                       </label>
                       <input
                         type="text"
-                        value={settings.companyName}
+                        value={settings.company_name}
                         onChange={(e) =>
-                          handleSettingChange("companyName", e.target.value)
+                          handleSettingChange("company_name", e.target.value)
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter company name"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium mb-2">
-                        Timezone
-                      </label>
-                      <select
-                        value={settings.timezone}
-                        onChange={(e) =>
-                          handleSettingChange("timezone", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="Asia/Kolkata">Asia/Kolkata</option>
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">
-                          America/New_York
-                        </option>
-                        <option value="Europe/London">Europe/London</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Date Format
-                      </label>
-                      <select
-                        value={settings.dateFormat}
-                        onChange={(e) =>
-                          handleSettingChange("dateFormat", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Currency
-                      </label>
-                      <select
-                        value={settings.currency}
-                        onChange={(e) =>
-                          handleSettingChange("currency", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="INR">INR (₹)</option>
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Support Email
-                      </label>
-                      <input
-                        type="email"
-                        value={settings.supportEmail}
-                        onChange={(e) =>
-                          handleSettingChange("supportEmail", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">
-                        Support Phone
+                        Primary Number
                       </label>
                       <input
                         type="text"
-                        value={settings.supportPhone}
+                        value={settings.primary_number}
                         onChange={(e) =>
-                          handleSettingChange("supportPhone", e.target.value)
+                          handleSettingChange("primary_number", e.target.value)
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter primary contact number"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        Secondary Number
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.secondary_number}
+                        onChange={(e) =>
+                          handleSettingChange("secondary_number", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter secondary contact number"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">
+                        WhatsApp Number
+                      </label>
+                      <input
+                        type="text"
+                        value={settings.whatsapp_number}
+                        onChange={(e) =>
+                          handleSettingChange("whatsapp_number", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter WhatsApp number"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium mb-2">
+                        Email ID
+                      </label>
+                      <input
+                        type="email"
+                        value={settings.email_id}
+                        onChange={(e) =>
+                          handleSettingChange("email_id", e.target.value)
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter email address"
                       />
                     </div>
                   </div>
