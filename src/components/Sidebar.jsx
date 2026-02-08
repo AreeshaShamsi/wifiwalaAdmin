@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
 function TwoColumnSidebar() {
@@ -13,12 +13,18 @@ function TwoColumnSidebar() {
     if (path === "/offer") return "Offers";
     if (path === "/complain") return "Complain";
     if (path === "/vipoffers") return "VIP Offers";
+    if (path === "/carousel-change") return "Carousel Change";
     if (path === "/settings") return "Settings";
     if (path === "/logout") return "Logout";
     return "Home";
   };
 
   const [activeItem, setActiveItem] = useState(getCurrentPage());
+
+  // Update active item when URL changes
+  useEffect(() => {
+    setActiveItem(getCurrentPage());
+  }, []);
 
   const handleNavClick = (path, href) => {
     if (path === "Logout") {
@@ -57,6 +63,12 @@ function TwoColumnSidebar() {
       label: "Offers",
       path: "Offers",
       href: "/offer",
+    },
+    {
+      icon: "fa-solid fa-images",
+      label: "Carousel Change",
+      path: "Carousel Change",
+      href: "/carousel-change",
     },
     {
       icon: "fa-solid fa-exclamation-circle",
