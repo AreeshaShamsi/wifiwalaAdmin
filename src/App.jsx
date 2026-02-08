@@ -3,6 +3,7 @@ import React from "react";
 
 import Home from "./pages/Home.jsx";
 import PlansPage from "./pages/Plans.jsx";
+import OperatorPlans from "./pages/OperatorPlans.jsx";
 import Offer from "./pages/Offers.jsx";
 import AdminLogin from "./pages/Login.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
@@ -36,6 +37,15 @@ function App() {
           element={
             <ProtectedRoute>
               <PlansPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/plans/:id"
+          element={
+            <ProtectedRoute>
+              <OperatorPlans />
             </ProtectedRoute>
           }
         />
