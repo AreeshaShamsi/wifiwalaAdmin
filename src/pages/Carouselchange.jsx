@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar.jsx";
 
-const API_BASE = "http://localhost:5000/api/carousel";
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/carousel`;
 
 export default function AdminCarouselPanel() {
   const [slides, setSlides] = useState([]);
@@ -20,7 +20,9 @@ export default function AdminCarouselPanel() {
       if (!res.ok) {
         const errorText = await res.text();
         console.error("Failed to fetch slides:", res.status, errorText);
-        setError(`Failed to fetch slides: ${res.status} - Check if backend route /api/carousel exists`);
+        setError(
+          `Failed to fetch slides: ${res.status} - Check if backend route /api/carousel exists`,
+        );
         setSlides([]);
         return;
       }
@@ -31,7 +33,9 @@ export default function AdminCarouselPanel() {
       setError(null);
     } catch (error) {
       console.error("Error fetching slides:", error);
-      setError(`Connection error: ${error.message}. Is backend running on port 5000?`);
+      setError(
+        `Connection error: ${error.message}. Is backend running on port 5000?`,
+      );
       setSlides([]);
     }
   };
@@ -71,7 +75,7 @@ export default function AdminCarouselPanel() {
     }
 
     // Check if position already exists
-    if (slides.some(s => s.position === parseInt(newPosition))) {
+    if (slides.some((s) => s.position === parseInt(newPosition))) {
       alert(`Position ${newPosition} already exists`);
       return;
     }
@@ -150,7 +154,9 @@ export default function AdminCarouselPanel() {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Carousel Management</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Carousel Management
+            </h1>
             <p className="text-gray-600 mt-1">Manage your carousel slides</p>
           </div>
 
@@ -161,8 +167,18 @@ export default function AdminCarouselPanel() {
             }}
             className="bg-blue-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors shadow-md flex items-center gap-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add Slide
           </button>
@@ -171,8 +187,18 @@ export default function AdminCarouselPanel() {
         {/* Error Display */}
         {error && (
           <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-lg p-4 flex items-start gap-3">
-            <svg className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
             <div className="flex-1">
               <h4 className="text-red-800 font-semibold mb-1">Error</h4>
@@ -182,8 +208,18 @@ export default function AdminCarouselPanel() {
               onClick={() => setError(null)}
               className="text-red-400 hover:text-red-600"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -193,18 +229,26 @@ export default function AdminCarouselPanel() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-blue-900 text-white rounded-xl p-5 shadow-md">
             <div className="text-sm font-medium opacity-90">Total Slides</div>
-            <div className="text-3xl font-bold mt-2">{Array.isArray(slides) ? slides.length : 0}</div>
+            <div className="text-3xl font-bold mt-2">
+              {Array.isArray(slides) ? slides.length : 0}
+            </div>
           </div>
           <div className="bg-green-600 text-white rounded-xl p-5 shadow-md">
             <div className="text-sm font-medium opacity-90">Active Slides</div>
             <div className="text-3xl font-bold mt-2">
-              {Array.isArray(slides) ? slides.filter(s => s.is_active).length : 0}
+              {Array.isArray(slides)
+                ? slides.filter((s) => s.is_active).length
+                : 0}
             </div>
           </div>
           <div className="bg-gray-600 text-white rounded-xl p-5 shadow-md">
-            <div className="text-sm font-medium opacity-90">Inactive Slides</div>
+            <div className="text-sm font-medium opacity-90">
+              Inactive Slides
+            </div>
             <div className="text-3xl font-bold mt-2">
-              {Array.isArray(slides) ? slides.filter(s => !s.is_active).length : 0}
+              {Array.isArray(slides)
+                ? slides.filter((s) => !s.is_active).length
+                : 0}
             </div>
           </div>
         </div>
@@ -222,12 +266,14 @@ export default function AdminCarouselPanel() {
                   <h2 className="font-semibold text-lg">
                     Position {slide.position}
                   </h2>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                    slide.is_active 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-gray-400 text-white'
-                  }`}>
-                    {slide.is_active ? 'Active' : 'Inactive'}
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      slide.is_active
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-400 text-white"
+                    }`}
+                  >
+                    {slide.is_active ? "Active" : "Inactive"}
                   </span>
                 </div>
 
@@ -236,27 +282,58 @@ export default function AdminCarouselPanel() {
                   {slide.image_url ? (
                     <div className="relative">
                       <img
-                        src={slide.image_url.startsWith('http') ? slide.image_url : `http://localhost:5000${slide.image_url}`}
+                        src={
+                          slide.image_url.startsWith("http")
+                            ? slide.image_url
+                            : `${import.meta.env.VITE_API_BASE_URL}${slide.image_url}`
+                        }
                         alt={`Slide ${slide.position}`}
                         className="w-full h-48 object-contain rounded-lg border-2 border-gray-200 bg-gray-50"
                         onError={(e) => {
-                          console.error('Image failed to load:', slide.image_url);
-                          e.target.style.display = 'none';
-                          e.target.nextElementSibling.style.display = 'flex';
+                          console.error(
+                            "Image failed to load:",
+                            slide.image_url,
+                          );
+                          e.target.style.display = "none";
+                          e.target.nextElementSibling.style.display = "flex";
                         }}
                       />
                       <div className="hidden h-48 flex-col items-center justify-center border-2 border-gray-300 rounded-lg bg-red-50">
-                        <svg className="w-12 h-12 text-red-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        <svg
+                          className="w-12 h-12 text-red-400 mb-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                          />
                         </svg>
-                        <p className="text-red-500 text-sm font-medium">Failed to Load Image</p>
-                        <p className="text-xs text-gray-500 mt-1 px-4 text-center break-all">{slide.image_url}</p>
+                        <p className="text-red-500 text-sm font-medium">
+                          Failed to Load Image
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1 px-4 text-center break-all">
+                          {slide.image_url}
+                        </p>
                       </div>
                     </div>
                   ) : (
                     <div className="h-48 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-                      <svg className="w-12 h-12 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <svg
+                        className="w-12 h-12 text-gray-400 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
                       </svg>
                       <p className="text-gray-400 text-sm">No Image Uploaded</p>
                     </div>
@@ -294,8 +371,18 @@ export default function AdminCarouselPanel() {
                       className="w-full px-4 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
                       disabled={loading}
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
                       </svg>
                       Delete Slide
                     </button>
@@ -306,11 +393,25 @@ export default function AdminCarouselPanel() {
           </div>
         ) : (
           <div className="text-center py-16">
-            <svg className="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-24 h-24 mx-auto text-gray-300 mb-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No Slides Yet</h3>
-            <p className="text-gray-500 mb-6">Get started by adding your first carousel slide</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No Slides Yet
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Get started by adding your first carousel slide
+            </p>
             <button
               onClick={() => {
                 setNewPosition("1");
@@ -396,7 +497,7 @@ export default function AdminCarouselPanel() {
                     className="flex-1 px-6 py-3 bg-blue-900 text-white rounded-lg font-semibold hover:bg-blue-800 transition-colors"
                     disabled={loading}
                   >
-                    {loading ? 'Creating...' : 'Create Slide'}
+                    {loading ? "Creating..." : "Create Slide"}
                   </button>
                 </div>
               </div>
@@ -417,16 +518,31 @@ export default function AdminCarouselPanel() {
               <div className="p-6">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <svg
+                      className="w-6 h-6 text-red-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
                     </svg>
                   </div>
                   <div className="flex-1">
                     <p className="text-gray-700 text-lg mb-2">
-                      Are you sure you want to delete <span className="font-semibold">Slide Position {slideToDelete?.position}</span>?
+                      Are you sure you want to delete{" "}
+                      <span className="font-semibold">
+                        Slide Position {slideToDelete?.position}
+                      </span>
+                      ?
                     </p>
                     <p className="text-gray-500 text-sm">
-                      This action cannot be undone. The slide will be permanently removed from the carousel.
+                      This action cannot be undone. The slide will be
+                      permanently removed from the carousel.
                     </p>
                   </div>
                 </div>
@@ -448,7 +564,7 @@ export default function AdminCarouselPanel() {
                     className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
                     disabled={loading}
                   >
-                    {loading ? 'Deleting...' : 'Delete Slide'}
+                    {loading ? "Deleting..." : "Delete Slide"}
                   </button>
                 </div>
               </div>

@@ -258,7 +258,9 @@ const Offers = () => {
   const fetchOffers = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/offers");
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/offers`,
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch offers");
@@ -277,7 +279,7 @@ const Offers = () => {
 
   const fetchPlans = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/plans");
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plans`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch plans");
@@ -292,7 +294,7 @@ const Offers = () => {
 
   const fetchOperators = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/plans/operators");
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plans/operators`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch operators");
@@ -359,7 +361,7 @@ const Offers = () => {
         is_active: formData.is_active,
       };
 
-      const response = await fetch("http://localhost:5000/api/offers/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/offers/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -418,7 +420,7 @@ const Offers = () => {
       };
 
       const response = await fetch(
-        `http://localhost:5000/api/offers/${editOfferId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/offers/${editOfferId}`,
         {
           method: "PUT",
           headers: {
@@ -454,7 +456,7 @@ const Offers = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/offers/${offerId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/offers/${offerId}`,
         {
           method: "DELETE",
         },
@@ -474,7 +476,7 @@ const Offers = () => {
   const toggleOfferStatus = async (offerId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/offers/${offerId}/toggle-status`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/offers/${offerId}/toggle-status`,
         {
           method: "PATCH",
         },

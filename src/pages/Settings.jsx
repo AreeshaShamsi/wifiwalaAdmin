@@ -29,12 +29,14 @@ function Settings() {
   const fetchSettings = async () => {
     try {
       setFetchLoading(true);
-      const res = await fetch("http://localhost:5000/api/settings");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/settings`,
+      );
       if (!res.ok) {
         throw new Error("Failed to fetch settings");
       }
       const data = await res.json();
-      
+
       // If settings exist, use the first one
       if (data && data.length > 0) {
         const dbSettings = data[0];
@@ -81,16 +83,19 @@ function Settings() {
       let res;
       if (settings.id) {
         // Update existing settings
-        res = await fetch(`http://localhost:5000/api/settings/${settings.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
+        res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/settings/${settings.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
           },
-          body: JSON.stringify(payload),
-        });
+        );
       } else {
         // Create new settings
-        res = await fetch("http://localhost:5000/api/settings", {
+        res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/settings`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -105,7 +110,7 @@ function Settings() {
 
       const data = await res.json();
       alert(data.message || "Settings saved successfully!");
-      
+
       // Refresh settings from server
       await fetchSettings();
     } catch (error) {
@@ -274,7 +279,10 @@ function Settings() {
                         type="text"
                         value={settings.secondary_number}
                         onChange={(e) =>
-                          handleSettingChange("secondary_number", e.target.value)
+                          handleSettingChange(
+                            "secondary_number",
+                            e.target.value,
+                          )
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Enter secondary contact number"

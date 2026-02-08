@@ -38,7 +38,7 @@ const OperatorPlans = () => {
 
       // Fetch operator details
       const operatorResponse = await fetch(
-        "http://localhost:5000/api/plans/operators",
+        `${import.meta.env.VITE_API_BASE_URL}/api/plans/operators`,
       );
       if (!operatorResponse.ok) {
         throw new Error("Failed to fetch operator details");
@@ -51,7 +51,7 @@ const OperatorPlans = () => {
 
       // Fetch plans for this operator
       const plansResponse = await fetch(
-        `http://localhost:5000/api/plans?operator_id=${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/plans?operator_id=${id}`,
       );
       if (!plansResponse.ok) {
         throw new Error("Failed to fetch plans");
@@ -71,7 +71,7 @@ const OperatorPlans = () => {
   const fetchOTTPlatforms = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/plans/ott-platforms",
+        `${import.meta.env.VITE_API_BASE_URL}/api/plans/ott-platforms`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch OTT platforms");
@@ -158,7 +158,7 @@ const OperatorPlans = () => {
         description: formData.description || "",
       };
 
-      const response = await fetch("http://localhost:5000/api/plans/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/plans/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -253,7 +253,7 @@ const OperatorPlans = () => {
         description: formData.description || "",
       };
       const response = await fetch(
-        `http://localhost:5000/api/plans/update/${editPlanId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/plans/update/${editPlanId}`,
         {
           method: "PUT",
           headers: {
@@ -289,7 +289,7 @@ const OperatorPlans = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/api/plans/delete/${planId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/plans/delete/${planId}`,
         {
           method: "DELETE",
         },
