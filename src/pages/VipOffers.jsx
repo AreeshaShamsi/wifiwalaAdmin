@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar.jsx";
+
 
 const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}`;
 
@@ -158,7 +158,7 @@ const VIPPlans = () => {
 
   return (
     <div className="flex min-h-screen bg-white">
-      <Sidebar />
+      
       <div className="flex-1 p-6">
         <div className="flex justify-between mb-6">
           <h1 className="text-3xl font-bold">VIP Plans</h1>

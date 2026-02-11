@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar.jsx";
+
 
 function Subscribed() {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -66,7 +66,7 @@ function Subscribed() {
 
   return (
     <>
-      <Sidebar />
+      
       <div className="lg:ml-64 min-h-screen lg:p-4">
         <div className="h-full lg:min-h-[calc(100vh-2rem)] bg-white/40 backdrop-blur-sm lg:rounded-[3rem] p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/50">
           <div className="flex justify-between items-center mb-4">

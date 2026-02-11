@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar.jsx";
+
 
 const Plans = () => {
   const [operators, setOperators] = useState([]);
@@ -38,7 +38,7 @@ const Plans = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
-        <Sidebar />
+        
         <div className="lg:ml-64 flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
@@ -52,7 +52,7 @@ const Plans = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
-        <Sidebar />
+        
         <div className="lg:ml-64 flex items-center justify-center min-h-screen">
           <div className="bg-white/70 backdrop-blur-md rounded-2xl p-8 border border-red-200 shadow-lg max-w-md">
             <div className="text-red-600 text-center">
@@ -75,7 +75,7 @@ const Plans = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100">
-      <Sidebar />
+      
 
       <div className="lg:ml-64 min-h-screen lg:p-4">
         <div className="h-full lg:min-h-[calc(100vh-2rem)] bg-white/40 backdrop-blur-sm lg:rounded-[3rem] p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/50">

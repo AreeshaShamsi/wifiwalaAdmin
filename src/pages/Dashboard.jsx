@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import Sidebar from "../components/Sidebar.jsx";
 
 function Dashboard() {
   const [currentDate] = useState(new Date());
@@ -94,7 +93,7 @@ function Dashboard() {
       />
 
       <div className="h-screen bg-gradient-to-br from-purple-100 via-blue-50 to-indigo-100 overflow-hidden">
-        <Sidebar />
+        
 
         <div className="lg:ml-64 h-screen lg:p-2">
           <div className="h-full bg-white/40 backdrop-blur-sm lg:rounded-3xl p-3 shadow-2xl border border-white/50 overflow-hidden flex flex-col">

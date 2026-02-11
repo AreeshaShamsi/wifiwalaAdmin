@@ -10,8 +10,7 @@ import {
   MessageSquare,
   Menu,
 } from "lucide-react";
-import Sidebar from "../components/Sidebar.jsx";
-// Sidebar Component
+
 
 // Main Complaints Component
 export default function Complaints() {
@@ -154,7 +153,7 @@ export default function Complaints() {
   if (loading) {
     return (
       <>
-        <Sidebar />
+        
         <div className="lg:ml-64 min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="inline-block w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
@@ -167,7 +166,7 @@ export default function Complaints() {
 
   return (
     <>
-      <Sidebar />
+      
       <div className="lg:ml-64 min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
         {/* Header */}
         <div className="mb-6">

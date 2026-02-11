@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar.jsx";
+
 
 function Settings() {
   const [settings, setSettings] = useState({
@@ -167,7 +167,7 @@ function Settings() {
   if (fetchLoading) {
     return (
       <>
-        <Sidebar />
+        
         <div className="lg:ml-64 min-h-screen lg:p-4">
           <div className="h-full lg:min-h-[calc(100vh-2rem)] bg-white/40 backdrop-blur-sm lg:rounded-[3rem] p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/50">
             <div className="flex items-center justify-center h-64">
@@ -184,7 +184,7 @@ function Settings() {
 
   return (
     <>
-      <Sidebar />
+      
       <div className="lg:ml-64 min-h-screen lg:p-4">
         <div className="h-full lg:min-h-[calc(100vh-2rem)] bg-white/40 backdrop-blur-sm lg:rounded-[3rem] p-4 sm:p-6 lg:p-8 shadow-2xl border border-white/50">
           <div className="flex justify-between items-center mb-6">

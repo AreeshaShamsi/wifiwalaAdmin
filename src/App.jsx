@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import React from "react";
 
 import Home from "./pages/Home.jsx";
@@ -14,20 +14,33 @@ import Users from "./pages/Users.jsx";
 import Subscribed from "./pages/Subscribed.jsx";
 import VIPoffers from "./pages/VipOffers.jsx";
 import Carousel from "./pages/Carouselchange.jsx";
+import Sidebar from "./components/Sidebar.jsx";
 
-function App() {
+function Layout() {
+  const location = useLocation();
+
   return (
-    <BrowserRouter>
+    <>
+      {/* Hide sidebar on login page */}
+      {location.pathname !== "/" && <Sidebar />}
+
       <Routes>
-        {/* Public route */}
         <Route path="/" element={<AdminLogin />} />
 
-        {/* Protected routes */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
             </ProtectedRoute>
           }
         />
@@ -59,7 +72,7 @@ function App() {
           }
         />
 
-         <Route
+        <Route
           path="/carousel-change"
           element={
             <ProtectedRoute>
@@ -67,7 +80,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
 
         <Route
           path="/offer"
@@ -114,6 +126,14 @@ function App() {
           }
         />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
     </BrowserRouter>
   );
 }
